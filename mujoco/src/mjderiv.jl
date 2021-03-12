@@ -1,5 +1,3 @@
-
-
 using BangBang
 using StaticArrays
 using MuJoCo
@@ -8,7 +6,7 @@ struct MJDeriv
     m::jlModel
     dmain::jlData
     datas::Vector{jlData}
-    daccdpos::Matrix{Float64} 
+    daccdpos::Matrix{Float64}
     daccdvel::Matrix{Float64}
     daccdfrc::Matrix{Float64}
 
@@ -341,7 +339,7 @@ function invworker(m::jlModel, dmain::jlData, d::jlData,
 
         # apply quaternion or simple perturbation
         if quatadr>=0
-            angvel .= 0.0 
+            angvel .= 0.0
             angvel[dofpos] = eps # already +1 from i
             getquat!(quat, d.qpos, quatadr)
             MuJoCo.MJCore.mju_quatIntegrate(quat, angvel, 1.0)
@@ -362,5 +360,3 @@ function invworker(m::jlModel, dmain::jlData, d::jlData,
 
     return nothing
 end
-
-

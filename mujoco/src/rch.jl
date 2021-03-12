@@ -1,4 +1,3 @@
-
 include("deps.jl")
 
 using Shapes
@@ -137,7 +136,7 @@ function valuetrain(p0, niter, opt=ADAM(0.001), bs=bs)
     xA[3,:] .= 0.2
     #display(reshape(xA[1,:], N, N))
     #display(reshape(xA[2,:], N, N))
-    
+
     for i=1:niter
         loss, pull = Zygote.pullback(p->l(p, valuef), p)
 
@@ -186,7 +185,7 @@ function valuetrain(p0, niter, opt=ADAM(0.001), bs=bs)
         mj_callback(p, loss, mjd, losses, T, niter)
         ProgressMeter.next!(prog; showvalues=[(:loss, loss), (:grad, ng)])
     end
-    
+
     display(lineplot(valuelosses))
     p, valuef
 end
@@ -198,7 +197,7 @@ function mylearn(p0, opt, nf, niter, clip=0.1f0; bptt=false)
     as = zeros(niter)
     pnorm = zeros(niter)
 
-    alpha = opt.eta 
+    alpha = opt.eta
     alpharange = exp10.(range(log10(alpha), -3.0, length=6))
 
     #l(p) = odeloss(f, p, tspan, mjd; batchsize=bs)
@@ -209,7 +208,7 @@ function mylearn(p0, opt, nf, niter, clip=0.1f0; bptt=false)
     for i=1:niter
         lossval, pull = Zygote.pullback(l, ps)
         ∇ps = pull(1)[1]
-        
+
         ls_nf = 0
         ls = [ begin
                   alphals = l(ps - a*∇ps)
@@ -289,5 +288,3 @@ function collotest(p0, N, niter, opt=ADAM(0.001), tq = _getreacherdemos(N))
                                   maxiters=numiter) # 1st order
     res1.minimizer
 end
-
-

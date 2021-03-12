@@ -1,4 +1,3 @@
-
 include("deps.jl")
 
 import Random: seed!
@@ -59,7 +58,7 @@ testenv = mjd.envs[1]
 reset!(testenv)
 u0 = [fast_getstate(testenv); 0.0]
 
-T = 0.5 #2.0 
+T = 0.5 #2.0
 H = T #0.5
 maxiters = 4e3
 tspan = (0, H)
@@ -96,7 +95,7 @@ bs = 4
 #opt = Descent(0.1)
 #opt = Momentum(0.01)
 #opt = BFGS(initial_stepnorm = 0.01)
-#opt = LBFGS(; alphaguess=InitialStatic(alpha=0.01, scaled=true), 
+#opt = LBFGS(; alphaguess=InitialStatic(alpha=0.01, scaled=true),
 #            linesearch=HagerZhang())
 
 function dotrain(p0, niter, opt=ADAM(0.001), bs=bs)
@@ -134,7 +133,7 @@ function valuetrain(p0, niter, opt=ADAM(0.001), bs=bs)
     xA[2,:] = vec(repeat(r', N)')
     #display(reshape(xA[1,:], N, N))
     #display(reshape(xA[2,:], N, N))
-    
+
     for i=1:niter
         loss, pull = Zygote.pullback(p->l(p, valuef), p)
 
@@ -183,7 +182,7 @@ function valuetrain(p0, niter, opt=ADAM(0.001), bs=bs)
         mj_callback(p, loss, mjd, losses, T, niter)
         ProgressMeter.next!(prog; showvalues=[(:loss, loss), (:grad, ng)])
     end
-    
+
     display(lineplot(valuelosses))
     p, valuef
 end
@@ -234,7 +233,7 @@ function collotest(p0, N, niter, opt=ADAM(0.001), tq = _getpointmassdemos(N))
     res1.minimizer
 end
 
-function mylearn(init_p) 
+function mylearn(init_p)
     ps = init_p
     losses = Vector{Float64}(undef, 0) #zeros(niter)
 
@@ -286,4 +285,3 @@ function pntlearn(init_p, alpha, niter; bptt=false)
 end
 
 #p1 = pntlearn(p0, 0.01, 50)
-

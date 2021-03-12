@@ -13,10 +13,7 @@ using ProgressMeter
 import Random: seed!
 
 include("mj_utils.jl")
-<<<<<<< HEAD
-include("rff.jl")
-=======
->>>>>>> 87a74c89cca19651bc12697b0cb707076f2b0373
+# include("rff.jl")
 include("models/cartpolev2.jl"); envt = CartpoleSwingupV2
 
 Zygote.refresh()
@@ -35,7 +32,7 @@ policy = FastChain(FastDense(infeat, nh, act),
                             )
                    )
 
-#rfflayer = RandomFourierFunctions{Float32}(0.8f0, infeat, 128) 
+#rfflayer = RandomFourierFunctions{Float32}(0.8f0, infeat, 128)
 #
 #policy = FastChain((x,_) -> rfflayer(x),
 #                   FastDense(128, setupenv.sim.m.nu, tanh))
@@ -96,7 +93,7 @@ function loss(p, mjd, batchsize=1, H=H)
                                           solver,
                                           u0=newstart,
                                           p = p;
-                                          solveargs..., 
+                                          solveargs...,
                                           saveat=(H,),
                                           saveend=true,
                                           maxiters=maxiters))
@@ -108,7 +105,7 @@ function loss(p, mjd, batchsize=1, H=H)
                                   solver,
                                   u0 = newstart,
                                   p  = p;
-                                  solveargs..., 
+                                  solveargs...,
                                   maxiters = maxiters,
                                   #saveat=(0,T),
                                   saveend=true))
@@ -117,7 +114,7 @@ function loss(p, mjd, batchsize=1, H=H)
         end
     end
     #Zygote.@ignore Base.GC.enable(true)
-    
+
     sum(copy(b))/batchsize # divide for our reference
 end
 
@@ -138,7 +135,7 @@ function mpcloss(p, mjd, batchsize=1)
                                       solver,
                                       u0=newstart,
                                       p = p;
-                                      solveargs..., 
+                                      solveargs...,
                                       saveat=(H,),
                                       saveend=true,
                                       maxiters=maxiters))
@@ -149,7 +146,7 @@ function mpcloss(p, mjd, batchsize=1)
                                   solver,
                                   u0 = newstart,
                                   p  = p;
-                                  solveargs..., 
+                                  solveargs...,
                                   maxiters = maxiters,
                                   #saveat=(0,T),
                                   saveend=true))
@@ -157,7 +154,7 @@ function mpcloss(p, mjd, batchsize=1)
             b[i] = cost
         end
     end
-    
+
     sum(copy(b))/batchsize # divide for our reference
 end
 
@@ -177,22 +174,18 @@ opt = ADAM(0.03)
 #opt = Descent(0.01)
 #opt = Momentum(0.0001)
 #@time res1 = DiffEqFlux.sciml_train(p->mpcloss(p, mjd, bs), p0, opt;
-#                                    cb=(x...)->mj_callback(x..., mjd, T), 
+#                                    cb=(x...)->mj_callback(x..., mjd, T),
 #                                    maxiters=niter) # 1st order
 
 #opt = BFGS()
 #@time res1 = DiffEqFlux.sciml_train(p->loss(p, mjd, bs), p0, opt;
-#                                    cb=(x...)->mj_callback(x..., mjd, T), 
+#                                    cb=(x...)->mj_callback(x..., mjd, T),
 #                                    maxiters=niter, allow_f_increases=true) # bfgs
 
 #p0 = res1.minimizer
 
 function mylearn(init_p, alpha, opt, niter, clip=0.1f0)
-<<<<<<< HEAD
     ps = copy(init_p)
-=======
-    ps = init_p
->>>>>>> 87a74c89cca19651bc12697b0cb707076f2b0373
     losses = Vector{Float64}(undef, 0) #zeros(niter)
     as = zeros(niter)
     pnorm = zeros(niter)
@@ -203,7 +196,7 @@ function mylearn(init_p, alpha, opt, niter, clip=0.1f0)
     @showprogress for i=1:niter
         lossval, pull = Zygote.pullback(l, ps)
         ∇ps = copy(pull(1)[1])
-        
+
         ls = [ l(ps - a*∇ps) for a in alpharange ]
         #display(lineplot(log10.(alpharange), ls, width=60, height=3))
         minloss, aidx = findmin(ls)
@@ -226,19 +219,11 @@ function mylearn(init_p, alpha, opt, niter, clip=0.1f0)
     mj_callback(ps, losses[end], mjd, losses, T; doplot=true)
     #display(lineplot(log10.(as), width=60, height=6, ylabel="10^"))
     display(lineplot(pnorm, width=60, height=6, title="gradnorm"))
-<<<<<<< HEAD
     display(lineplot(as, width=60, height=6, ylabel="steps"))
     ps
 end
 
 #p1 = mylearn(p0, 0.03, Descent(0.03), 200, 1.0f0);
-=======
-    display(lineplot(as, width=60, height=6, ylabel="10^"))
-    ps
-end
-
-p1 = mylearn(p0, 0.03, Descent(0.03), 200, 1.0f0);
->>>>>>> 87a74c89cca19651bc12697b0cb707076f2b0373
 
 #=
 opt = BFGS()#initial_stepnorm = 0.1)
@@ -250,11 +235,11 @@ for h = T:-0.2:0.0 #in [0.1, 0.2, 0.3, 0.4, 0.5, 0.8, 1.5, 3.0]
     niter=50
     opt = ADAM(0.01)
     @time res1 = DiffEqFlux.sciml_train(p->loss(p, mjd, bs, h), p0, opt;
-                                        cb=(x...)->mj_callback(x..., mjd, T-h;skipiter=niter), 
+                                        cb=(x...)->mj_callback(x..., mjd, T-h;skipiter=niter),
                                         maxiters=niter) # 1st order
     #opt = BFGS(initial_stepnorm = 0.1)
     #@time res1 = DiffEqFlux.sciml_train(p->loss(p, mjd, bs), p0, opt;
-    #                                    cb=(x...)->mj_callback(x..., mjd, h), 
+    #                                    cb=(x...)->mj_callback(x..., mjd, h),
     #                                    maxiters=niter, allow_f_increases=true) # bfgs
     display(res1)
     global p0 = res1.minimizer
@@ -265,9 +250,7 @@ mj_callback(p0, losses[end], mjd, T; doplot=true)
 #opt = BFGS(initial_stepnorm = 0.1;
 #           alphaguess=InitialHagerZhang(α0=0.1),
 #           linesearch=HagerZhang())
-#opt = LBFGS(; alphaguess=InitialStatic(alpha=0.01, scaled=true), 
+#opt = LBFGS(; alphaguess=InitialStatic(alpha=0.01, scaled=true),
 #            linesearch=HagerZhang())
 
 #mj_callback(res1.minimizer, res1.minimum, mjd, T; doplot=true)
-
-
