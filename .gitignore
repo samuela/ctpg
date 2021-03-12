@@ -1,0 +1,7 @@
+*.log
+mass_spring_output/
+/results/
+._*
+
+# shell.nix sets $PIP_PREFIX which tells pip to install crap into _build/
+/_build/
